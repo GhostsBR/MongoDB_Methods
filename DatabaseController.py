@@ -15,7 +15,8 @@ class bcolors:
 
 
 class Database:
-    conn = pymongo.MongoClient("mongodb+srv://system:vD1TyTbZuwz2XI29@cluster0.8ehcf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    conn = pymongo.MongoClient("mongodb+srv://system:vD1TyTbZuwz2XI29@cluster0.8ehcf.mongodb.net/"
+                               "myFirstDatabase?retryWrites=true&w=majority")
     db = conn["methods"]
 
 
@@ -24,39 +25,54 @@ class Users(Database):
         self.users = self.db["users"]
 
     def insert(self, values):
-        if not values:
+        try:
+            if type(values) == dict:
+                self.users.insert_one(values)
+            elif type(values) == list:
+                self.users.insert_many(values)
+            else:
+                print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
+        except:
+            print(f"{bcolors.FAIL}Não foi possível inserir o USUARIO no banco de dados.{bcolors.ENDC}")
             return False
 
-        if type(values) == dict:
-            self.users.insert_one(values)
-        elif type(values) == list:
-            self.users.insert_many(values)
-        else:
-            print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
-
     def update(self, values):
-        if type(values) == dict:
-            self.users.update_one(values)
-        elif type(values) == list:
-            self.users.update_many(values)
-        else:
-            print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
+        try:
+            if type(values) == dict:
+                self.users.update_one(values)
+            elif type(values) == list:
+                self.users.update_many(values)
+            else:
+                print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
+        except:
+            print(f"{bcolors.FAIL}Não foi possível atualizar o USUARIO no banco de dados.{bcolors.ENDC}")
+            return False
 
     def get(self, find_one, values):
-        if find_one:
-            return self.users.find_one(values)
-        else:
-            return self.users.find(values)
+        try:
+            if find_one:
+                return self.users.find_one(values)
+            else:
+                return self.users.find(values)
+        except:
+            print(f"{bcolors.FAIL}Não foi possível selecionar o USUARIO no banco de dados.{bcolors.ENDC}")
+            return False
 
     def list(self, value):
-        if type(value) == object:
-            value = list(value)
-        return pd.json_normalize(value)
+        try:
+            if type(value) == object:
+                value = list(value)
+            return pd.json_normalize(value)
+        except:
+            print(f"{bcolors.FAIL}Não foi mostrar os dados!{bcolors.ENDC}")
+            return False
 
-    def delete(self, values):
-        if type(values) == dict:
-            self.users.delete_one(values)
-        elif type(values) == list:
-            self.users.delete_many(values)
-        else:
-            print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
+    def delete(self, remove_one, values):
+        try:
+            if remove_one:
+                return self.users.delete_one(values)
+            else:
+                return self.users.delete_many(values)
+        except:
+            print(f"{bcolors.FAIL}Não foi possível apagar o USUARIO do banco de dados.{bcolors.ENDC}")
+            return False
