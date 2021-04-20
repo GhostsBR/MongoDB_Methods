@@ -28,22 +28,24 @@ class Users(Database):
         try:
             if type(values) == dict:
                 self.users.insert_one(values)
+                return True
             elif type(values) == list:
                 self.users.insert_many(values)
+                return True
             else:
                 print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
         except:
             print(f"{bcolors.FAIL}Não foi possível inserir o USUARIO no banco de dados.{bcolors.ENDC}")
             return False
 
-    def update(self, values):
+    def update(self, update_one, serach_values, replace_values):
         try:
-            if type(values) == dict:
-                self.users.update_one(values)
-            elif type(values) == list:
-                self.users.update_many(values)
+            if update_one:
+                self.users.update_one(serach_values, {"$set": replace_values})
+                return True
             else:
-                print(f"{bcolors.WARNING}O valor a ser inserido precisa ser uma lista ou dicionário!{bcolors.ENDC}")
+                self.users.update_many(serach_values, {"$set": replace_values})
+                return True
         except:
             print(f"{bcolors.FAIL}Não foi possível atualizar o USUARIO no banco de dados.{bcolors.ENDC}")
             return False
@@ -70,9 +72,11 @@ class Users(Database):
     def delete(self, remove_one, values):
         try:
             if remove_one:
-                return self.users.delete_one(values)
+                self.users.delete_one(values)
+                return True
             else:
-                return self.users.delete_many(values)
+                self.users.delete_many(values)
+                return True
         except:
             print(f"{bcolors.FAIL}Não foi possível apagar o USUARIO do banco de dados.{bcolors.ENDC}")
             return False
